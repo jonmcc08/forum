@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Forum</h1>
+        <ol>
+            <li>
+                <a href="/">Homepage</a>
+            </li>
+            <li>
+                <a href="/posts">Posts</a>
+            </li>
+            <li>
+                <a href="/create-post">Create Post</a>
+            </li>
+        </ol>
+    </header>
+    {% block content %}{% endblock %}
+    <footer>
+        <p>Please be nice in the Forum!<br>&#169 Jonathan
+        </p>
+    </footer>
+</body>
+</html>
