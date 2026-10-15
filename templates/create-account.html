@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="post">
+    Firstname: <input name="firstname"> <br>
+    Lastname: <input name="lastname"> <br><br>
+    Username: <input name="username"> <br>
+    Password: <input name="password" type="password"> <br>
+    Profile Picture: <input name="picture" type="file" accept="image/png, image/jpg, image/jpeg"> <br>
+    <input type="submit">
+</form>
+{% endblock %}

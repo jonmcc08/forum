@@ -1,7 +1,18 @@
 from flask import Flask, session, render_template, request, url_for, redirect
+import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = "1TSJ0NTEYTS3CR3TK3Y"
+
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="foruminloggning"
+)
+mycursor = mydb.cursor()
+print(f"Logged into {mydb.database}.")
+
 
 # Temporärt tills när databaser är lärda
 USERS = {
@@ -32,9 +43,22 @@ def login():
         return "Wrong username or password", {"Refresh": "2; url=/login"}
     return render_template("login.html")
 
-@app.route("/signup")
+@app.route("/signup", methods=["GET", "POST"])
 def account_creation():
-    return render_template("base.html")
+    if request.method == "POST":
+        firstname = request.form["firstname"]
+        lastname = request.form["lastname"]
+        username = request.form["username"]
+        password = request.form["password"]
+        image = request.files["picture"]
+
+        sql = "INSERT INTO users (username, firstname, lastname, image, password) VALUES (%s, %s, %s, %s, %s)"
+        val = (username, firstname, lastname, image, password)
+        mycursor.execute(sql, val)
+        mydb.commit()
+        print(mycursor.rowcount, "added.")
+
+    return render_template("create-account.html")
 
 @app.route("/posts")
 def posts():
@@ -51,6 +75,6 @@ def createPost():
     if request.method == "POST":
         # Mer kod senare        
         return "Created Post"
-    return render_template("create.html")
+    return render_template("create-post.html")
 
 app.run(host="0.0.0.0", port=5000, debug=True)
