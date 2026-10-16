@@ -1,8 +1,15 @@
 from flask import Flask, session, render_template, request, url_for, redirect
-import mysql.connector
+import mysql.connector, os
+from fernet import Fernet
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "1TSJ0NTEYTS3CR3TK3Y"
+app.secret_key = os.getenv("APP_SECRET_KEY")
+encryption_key = os.getenv("PASSWORD_ENCRYPTION_KEY")
+assert encryption_key
+FERNET = Fernet(encryption_key) #Fixa
 
 mydb = mysql.connector.connect(
     host="localhost",
@@ -13,12 +20,17 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 print(f"Logged into {mydb.database}.")
 
+def userLogin(username, password):
+    sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
+    mycursor.execute(sql, (username,))
 
-# Temporärt tills när databaser är lärda
-USERS = {
-    'admin': {"password": "123"},
-    'jonte': {"password": "Twitch.tv/ItsJonteYT"}
-}
+    user = mycursor.fetchone()
+    if user == None:
+        return 1 
+    userPswd = user[4]
+    if password == userPswd:
+        return 3
+    return 2
 
 def loggedIn():
     user = session.get("user")
@@ -36,8 +48,13 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        user = USERS.get(username)
-        if user and user["password"] == password:
+        user = userLogin(username, password)
+
+        if user == 1:
+            return "Account doesn't exist, please signup here: <a href=/signup>Signup</a>"
+        elif user == 2:
+            return "Incorrect password. Please try again", {"Refresh": "2; url=/login"}
+        elif user == 3:
             session["user"] = username
             return redirect(url_for("posts"))
         return "Wrong username or password", {"Refresh": "2; url=/login"}
@@ -49,14 +66,22 @@ def account_creation():
         firstname = request.form["firstname"]
         lastname = request.form["lastname"]
         username = request.form["username"]
-        password = request.form["password"]
-        image = request.files["picture"]
+        sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
+        mycursor.execute(sql, (username,))
+        
+        if mycursor.fetchone() != None:
+            return "Username is already taken, please try with another username.", {"Refresh": "2; url=/signup"}
 
-        sql = "INSERT INTO users (username, firstname, lastname, image, password) VALUES (%s, %s, %s, %s, %s)"
-        val = (username, firstname, lastname, image, password)
+
+        password = request.form["password"]
+        # image = request.files["picture"]
+
+        sql = "INSERT INTO users (username, firstname, lastname, password) VALUES (%s, %s, %s, %s);"
+        val = (username, firstname, lastname, password)
         mycursor.execute(sql, val)
         mydb.commit()
         print(mycursor.rowcount, "added.")
+        return "Account created.", {"Refresh": "2; url=/login"}
 
     return render_template("create-account.html")
 
