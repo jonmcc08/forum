@@ -1,6 +1,6 @@
 let timerHtml = document.getElementById("timer")
 
-for (i = 3; i > 0; i--)
+for (let i = 3; i > 0; i--)
 {
     setTimeout(() => {
         timerHtml.innerHTML = i

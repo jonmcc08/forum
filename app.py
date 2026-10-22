@@ -1,15 +1,12 @@
 from flask import Flask, session, render_template, request, url_for, redirect
-import mysql.connector, os
-from fernet import Fernet
+import mysql.connector, os, bcrypt
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("APP_SECRET_KEY")
-encryption_key = os.getenv("PASSWORD_ENCRYPTION_KEY")
-assert encryption_key
-FERNET = Fernet(encryption_key) #Fixa
+s = bcrypt.gensalt()
 
 mydb = mysql.connector.connect(
     host="localhost",
@@ -27,8 +24,11 @@ def userLogin(username, password):
     user = mycursor.fetchone()
     if user == None:
         return 1 
-    userPswd = user[4]
-    if password == userPswd:
+    hashed_password = password.encode("utf-8")
+    encoded_password = user[4].encode("utf-8")
+    print(hashed_password)
+    print(encoded_password)
+    if bcrypt.checkpw(hashed_password, encoded_password):
         return 3
     return 2
 
@@ -44,10 +44,12 @@ def homepage():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if session.get("user") != None:
+        return redirect("/")
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-
+        
         user = userLogin(username, password)
 
         if user == 1:
@@ -62,6 +64,8 @@ def login():
 
 @app.route("/signup", methods=["GET", "POST"])
 def account_creation():
+    if session.get("user") != None:
+        return redirect("/")
     if request.method == "POST":
         firstname = request.form["firstname"]
         lastname = request.form["lastname"]
@@ -73,17 +77,23 @@ def account_creation():
             return "Username is already taken, please try with another username.", {"Refresh": "2; url=/signup"}
 
 
-        password = request.form["password"]
+        password = request.form["password"].encode("utf-8")
+        hashed_pw = bcrypt.hashpw(password, s)
         # image = request.files["picture"]
 
         sql = "INSERT INTO users (username, firstname, lastname, password) VALUES (%s, %s, %s, %s);"
-        val = (username, firstname, lastname, password)
+        val = (username, firstname, lastname, hashed_pw)
         mycursor.execute(sql, val)
         mydb.commit()
         print(mycursor.rowcount, "added.")
         return "Account created.", {"Refresh": "2; url=/login"}
 
     return render_template("create-account.html")
+
+@app.route("/log-out")
+def logout():
+    session.clear()
+    return redirect("/")
 
 @app.route("/posts")
 def posts():
