@@ -108,7 +108,19 @@ def createPost():
     if loggedInUser:
         return loggedInUser
     if request.method == "POST":
-        # Mer kod senare        
+        postname = request.form["postname"]
+        sql = "SELECT * FROM posts WHERE postname=%s LIMIT 1;"
+        mycursor.execute(sql, (postname,))
+        if mycursor.fetchone() != None:
+            return render_template("create-post.html", alreadyPost=True)
+
+        postdescription = request.form["postmessage"]
+
+        sql = "INSERT INTO posts (user, postname, postdescription, uploadtime) VALUES (%s, %s, %s, NOW())"
+        val = (session.get("user"), postname, postdescription)
+        mycursor.execute(sql, val)
+        mydb.commit()
+        print(mycursor.rowcount, "added.")
         return "Created Post"
     return render_template("create-post.html")
 

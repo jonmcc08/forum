@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="create-post">
-        <form>
-            
+        <form method="post">
+            <h2>Create a Post</h2>
+            <p style="font-weight: bold;">Post name</p>
+            <input type="text" maxlength="50" placeholder="Topic name" name="postname" autocomplete="off"> <br>
+            <p style="font-weight: bold;">Post message</p>
+            <textarea rows="4" cols="40" name="postmessage" maxlength="500"></textarea> <br>
+            <input type="submit">
+            {% if alreadyPost %}
+                <h2 style="color: red; font-weight: bolder;">POST ALREADY EXISTS</h2>
+            {% endif %}
         </form>
     </div>
 {% endblock %}
