@@ -1,6 +1,7 @@
 from flask import Flask, session, render_template, request, url_for, redirect
 import mysql.connector, os, bcrypt
 from dotenv import load_dotenv
+from PIL import Image
 
 load_dotenv()
 
@@ -53,7 +54,7 @@ def login():
         user = userLogin(username, password)
 
         if user == 1:
-            return "Account doesn't exist, please signup here: <a href=/signup>Signup</a>"
+            return "Account doesn't exist, please signup here: <a href=/signup>Sign up</a>"
         elif user == 2:
             return "Incorrect password. Please try again", {"Refresh": "2; url=/login"}
         elif user == 3:
@@ -69,6 +70,7 @@ def account_creation():
     if request.method == "POST":
         firstname = request.form["firstname"]
         lastname = request.form["lastname"]
+        email = request.form["email"]
         username = request.form["username"]
         sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
         mycursor.execute(sql, (username,))
@@ -79,10 +81,23 @@ def account_creation():
 
         password = request.form["password"].encode("utf-8")
         hashed_pw = bcrypt.hashpw(password, s)
-        # image = request.files["picture"]
+        image = request.files["picture"]
+        image_url = "nU.webp"
+        if image.filename != "":
+            with Image.open(image) as img:
+                print(f"Image: {img.size}")
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGBA")
+                else:
+                    img = img.convert("RGB")
 
-        sql = "INSERT INTO users (username, firstname, lastname, password) VALUES (%s, %s, %s, %s);"
-        val = (username, firstname, lastname, hashed_pw)
+                img = img.resize((100, 100), Image.Resampling.LANCZOS)
+                image_url = f"{username}.webp"
+                file_upload = os.path.join("static/profile_pictures", image_url)
+                img.save(file_upload, "WEBP", quality=80)
+
+        sql = "INSERT INTO users (username, firstname, lastname, email, imageURL, password) VALUES (%s, %s, %s, %s, %s, %s);"
+        val = (username, firstname, lastname, email, image_url, hashed_pw)
         mycursor.execute(sql, val)
         mydb.commit()
         print(mycursor.rowcount, "added.")
@@ -90,7 +105,7 @@ def account_creation():
 
     return render_template("create-account.html")
 
-@app.route("/log-out")
+@app.route("/signout")
 def logout():
     session.clear()
     return redirect("/")
@@ -100,7 +115,27 @@ def posts():
     loggedInUser = loggedIn()
     if loggedInUser:
         return loggedInUser
-    return render_template("posts.html")
+    sql = "SELECT * FROM posts"
+    mycursor.execute(sql)
+    return render_template("posts.html", posts=mycursor.fetchall())
+
+@app.route("/post/<post>", methods=["GET", "POST"])
+def post_loader(post):
+    if post == None:
+        return "Invalid post URL"
+
+    sql = "SELECT * FROM posts WHERE postname=%s LIMIT 1;"
+    mycursor.execute(sql, (post,))
+    currentpost = mycursor.fetchone()
+    print(currentpost)
+
+    sql = "SELECT * FROM comments WHERE post_id=%s LIMIT 1;"
+    mycursor.execute(sql, (currentpost[0],))
+    comments = mycursor.fetchall()
+
+    if request.method == "POST":
+        return render_template("post.html", sent=True, post=currentpost, comments=comments)
+    return render_template("post.html", sent=False, post=currentpost, comments=comments)
 
 @app.route("/create-post", methods=["GET", "POST"])
 def createPost():

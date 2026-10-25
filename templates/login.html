@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <form method="post">
-    Username: <input type="text" name="username" placeholder="Enter your username">
-    Password: <input type="password" name="password" placeholder="Enter your password">
+    Username: <input type="text" name="username" placeholder="Enter your username" autocomplete="username">
+    Password: <input type="password" name="password" placeholder="Enter your password" autocomplete="current-password">
     <input type="submit">
 </form>
 {% endblock %}
