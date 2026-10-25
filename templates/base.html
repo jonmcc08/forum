@@ -21,7 +21,23 @@
             </li>
         </ol>
         <div class="account">
-            
+            {% if session.get("user") %}
+                <ol class="account_list">
+                    <li class="account_name"> {{ session.get("user") }} </li>
+                    <li> 
+                        <a href="/signout">Sign out</a>
+                    </li>
+                </ol>
+            {% else %}
+                <ol class="account_list">
+                    <li>
+                        <a href="/signup">Sign up</a>
+                    </li>
+                    <li>
+                        <a href="/login">Log in</a>
+                    </li>
+                </ol>
+            {% endif %}
         </div>
     </header>
     {% block content %}{% endblock %}

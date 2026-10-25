@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <form method="post" enctype="multipart/form-data">
-    Firstname: <input name="firstname"> <br>
-    Lastname: <input name="lastname"> <br><br>
-    Username: <input name="username"> <br>
-    Password: <input name="password" type="password"> <br>
-    Profile Picture: <input name="picture" type="file" accept="image/png, image/jpg, image/jpeg"> <br>
-    <input type="submit">
+    Firstname: <input name="firstname" id="firstname" autocomplete="given-name"> <br>
+    Lastname: <input name="lastname" id="lastname" autocomplete="family-name"> <br>
+    Email: <input name="email" id="email" autocomplete="email"><br><br>
+    Username: <input name="username" id="username" autocomplete="username" minlength="3" maxlength="20"> <br>
+    Password: <input name="password" id="password" type="password" autocomplete="new-password"> <br>
+    Profile Picture: <input name="picture" id="picture" type="file" accept="image/png, image/jpg, image/jpeg"> <br>
+    <div id="picture-container">
+        <img id="uploaded-file" src="" alt="Picture of the user">
+    </div>
+    <input type="submit" id="submit">
 </form>
+<script src="/static/signup.js"></script>
 {% endblock %}

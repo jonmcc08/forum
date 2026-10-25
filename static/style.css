@@ -12,3 +12,19 @@ footer {
     display: flex;
     flex-direction: row;
 }
+
+.post-wrapper {
+    text-decoration: none;
+    color: black;
+    user-select: text;
+}
+
+#picture-container {
+    width: 100px;
+    height: 100px;
+}
+
+#uploaded-file {
+    width: 100%;
+    height: 100%;
+}

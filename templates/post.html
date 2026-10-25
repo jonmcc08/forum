@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="post">
+    <div class="post-title-card">
+        <h2 class="post-title">{{ post[2] }}</h2>
+        <p class="post-user">Posted by: {{ post[1] }}</p>
+        <p class="post-message">{{ post[3] }}</p>
+        <p class="post-time">
+        Uploaded: {{ post[4].strftime("%Y-%m-%d %H:%M:%S") }} </p>
+    </div>
+    <div>
+        
+    </div>
+</div>
+{% endblock %}
