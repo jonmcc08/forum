@@ -3,13 +3,43 @@
 <div class="post">
     <div class="post-title-card">
         <h2 class="post-title">{{ post[2] }}</h2>
+        <div class="commentProfile">
+            <div class="posts-author">
+                <img
+                    class="posts-profile-picture"
+                    src="{{ url_for('static', filename='profile_pictures/' ~ (post[6] or 'nU.webp')) }}"
+                    alt="{{ post[1] }}'s profile picture"
+                >
+            </div>
+        </div>
         <p class="post-user">Posted by: {{ post[1] }}</p>
         <p class="post-message">{{ post[3] }}</p>
-        <p class="post-time">
-        Uploaded: {{ post[4].strftime("%Y-%m-%d %H:%M:%S") }} </p>
+        <p class="post-time"> {{ post[4].strftime("%Y-%m-%d %H:%M:%S") }} </p>
     </div>
-    <div>
-        
+    <hr style="margin-top: 40px;">
+    <div class="comments">
+        {% for comment in comments %}
+            <div class="comment" {% if loop.index is even %} style="background-color: rgb(219, 219, 219);" {% endif %}>
+                <div class="commentProfile">
+                    <img
+                    class="posts-profile-picture"
+                    src="{{ url_for('static', filename='profile_pictures/' ~ (comment[5] or 'nU.webp')) }}"
+                    alt="{{ comment[2] }}'s profile picture"
+                    >
+                    <p>{{ comment[2] }}</p>
+                </div>
+                <p>{{ comment[3] }}</p>
+                <p>{{ comment[4] }}</p>
+            </div>
+            <hr>
+        {% endfor %}
+        <div class="createComment" style="margin-top: 10px; background-color: rgba(214, 214, 214, 0.349);">
+            <form method="post">
+                <h2>Comment</h2>
+                <textarea rows="4" cols="40" name="commentPost" minlength="1" maxlength="500"></textarea> <br>
+                <input type="submit">
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

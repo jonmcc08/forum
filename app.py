@@ -85,7 +85,6 @@ def account_creation():
         image_url = "nU.webp"
         if image.filename != "":
             with Image.open(image) as img:
-                print(f"Image: {img.size}")
                 if img.mode in ("RGBA", "P"):
                     img = img.convert("RGBA")
                 else:
@@ -115,27 +114,60 @@ def posts():
     loggedInUser = loggedIn()
     if loggedInUser:
         return loggedInUser
-    sql = "SELECT * FROM posts"
+    sql = "SELECT posts.*, users.imageURL FROM posts LEFT JOIN users ON posts.user = users.username"
     mycursor.execute(sql)
     return render_template("posts.html", posts=mycursor.fetchall())
 
 @app.route("/post/<post>", methods=["GET", "POST"])
 def post_loader(post):
-    if post == None:
-        return "Invalid post URL"
-
-    sql = "SELECT * FROM posts WHERE postname=%s LIMIT 1;"
+    loggedInUser = loggedIn()
+    if loggedInUser:
+        return loggedInUser
+    sql = "SELECT posts.*, users.imageURL FROM posts LEFT JOIN users ON posts.user = users.username WHERE posts.postname = %s"
     mycursor.execute(sql, (post,))
     currentpost = mycursor.fetchone()
     print(currentpost)
+    if currentpost == None:
+        return "Invalid post", {"Refresh": "3; url=/posts"}
 
-    sql = "SELECT * FROM comments WHERE post_id=%s LIMIT 1;"
+    if request.method == "POST":
+        sql = "INSERT INTO comments (post_id, comment_user, comment, uploadtime) VALUES (%s, %s, %s, NOW())"
+        user = session.get("user")
+        comment = request.form["commentPost"]
+        val = (currentpost[0], user, comment)
+        mycursor.execute(sql, val)
+        mydb.commit()
+        # Uppdaterar timern på post pagen
+        sql = "UPDATE posts SET lastcommenttime = NOW() WHERE postname = %s"
+        mycursor.execute(sql, (post,))
+        mydb.commit()
+        
+    sql = "SELECT comments.*, users.imageURL FROM comments LEFT JOIN users ON comments.comment_user = users.username WHERE post_id=%s"
     mycursor.execute(sql, (currentpost[0],))
     comments = mycursor.fetchall()
 
     if request.method == "POST":
         return render_template("post.html", sent=True, post=currentpost, comments=comments)
     return render_template("post.html", sent=False, post=currentpost, comments=comments)
+
+@app.route("/user/<user>")
+def user_loader(user):
+    loggedInUser = loggedIn()
+    if loggedInUser:
+        return loggedInUser
+
+    sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
+    mycursor.execute(sql, (user,))
+    currentuser = mycursor.fetchone()
+
+    if currentuser == None:
+        return "Invalid user", {"Refresh": "3; url=/posts"}
+    sql = "SELECT DISTINCT posts.* FROM posts JOIN comments ON posts.postid = comments.post_id WHERE posts.user = %s OR comments.comment_user = %s;"
+    mycursor.execute(sql, (currentuser[1], currentuser[1]))
+    activities = mycursor.fetchall()
+
+    return render_template("user.html", user=currentuser, currentAccount=(user==session.get("user")), activity=activities)
+    
 
 @app.route("/create-post", methods=["GET", "POST"])
 def createPost():

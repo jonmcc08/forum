@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+{{ currentAccount }}
+
+<div class="user">
+    <div class="user-profile-picture">
+        <img 
+        class="posts-profile-picture"
+        src="{{ url_for('static', filename='profile_pictures/' ~ (user[6] or 'nU.webp')) }}" 
+        alt="Profile Picture">
+        <h2>{{ user[1] }}</h2>
+    </div>
+    <div class="activities">
+        {% for post in activity %}
+            <div class="activity">
+                {{ post[2] }} : <a href="/post/{{ post[2] }}">Link</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

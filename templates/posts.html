@@ -4,8 +4,14 @@
     <a class="post-wrapper" href="post/{{ post[2] }}">
         <div class="posts" {% if loop.index is even %} style="background-color: rgb(219, 219, 219);" {% endif %}>
             <h2 class="posts-title">{{ post[2] }}</h2>
-            <img src="/static/profile_pictures/{{ post[6] }}">
-            <p class="posts-user">Posted by: {{ post[1] }}</p>
+            <div class="posts-author">
+                <img
+                    class="posts-profile-picture"
+                    src="{{ url_for('static', filename='profile_pictures/' ~ (post[6] or 'nU.webp')) }}"
+                    alt="{{ post[1] }}'s profile picture"
+                >
+                <p class="posts-user">Posted by: {{ post[1] }}</p>
+            </div>
             <p class="posts-time">
             Uploaded: {{ post[4].strftime("%Y-%m-%d %H:%M:%S") }} </p>
             {% if post[5] %}
@@ -13,5 +19,6 @@
             {% endif %}
         </div>
     </a>
+    <hr>
 {% endfor %}
 {% endblock %}
