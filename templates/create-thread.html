@@ -2,14 +2,14 @@
 {% block content %}
     <div class="create-post">
         <form method="post">
-            <h2>Create a Post</h2>
-            <p style="font-weight: bold;">Post name</p>
+            <h2>Create a Thread</h2>
+            <p style="font-weight: bold;">Thread name</p>
             <input type="text" minlength=1 maxlength="50" placeholder="Topic name" name="postname" autocomplete="off"> <br>
-            <p style="font-weight: bold;">Post message</p>
+            <p style="font-weight: bold;">Thread message</p>
             <textarea rows="4" cols="40" name="postmessage" minlength="1" maxlength="500"></textarea> <br>
             <input type="submit">
-            {% if alreadyPost %}
-                <h2 style="color: red; font-weight: bolder;">POST ALREADY EXISTS</h2>
+            {% if alreadyThread %}
+                <h2 style="color: red; font-weight: bolder;">THREAD ALREADY EXISTS</h2>
             {% endif %}
         </form>
     </div>

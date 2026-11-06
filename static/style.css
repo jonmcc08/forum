@@ -75,3 +75,26 @@ footer {
 .user {
     
 }
+
+.activity {
+    border: 2px solid black;
+}
+.userComment {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    text-decoration: none;
+    color: black;
+}
+
+.post-title-card {
+    background-color: rgba(137, 137, 137, 0.51);
+    padding: 10px;
+}
+
+.user-profile-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-{% for post in posts %}
-    <a class="post-wrapper" href="post/{{ post[2] }}">
+{% for post in threads %}
+    <a class="post-wrapper" href="thread/{{ post[2] }}">
         <div class="posts" {% if loop.index is even %} style="background-color: rgb(219, 219, 219);" {% endif %}>
             <h2 class="posts-title">{{ post[2] }}</h2>
             <div class="posts-author">

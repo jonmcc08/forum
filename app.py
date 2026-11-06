@@ -1,3 +1,13 @@
+# Vad som behövs för detta projekt:
+# ---------------------------------
+# Flask: pip install flask
+# MySQL: pip install mysql
+# bCrypt: pip install bcrypt
+# Pillow: pip install pillow
+# Dotenv: pip install dotenv
+
+# OBS!!! Eftersom att jag döpte "threads" till "posts" förut kommer backend fortfarande behålla post, men tänk det som en thread.
+
 from flask import Flask, session, render_template, request, url_for, redirect
 import mysql.connector, os, bcrypt
 from dotenv import load_dotenv
@@ -109,22 +119,22 @@ def logout():
     session.clear()
     return redirect("/")
 
-@app.route("/posts")
+@app.route("/threads")
 def posts():
     loggedInUser = loggedIn()
     if loggedInUser:
         return loggedInUser
     sql = "SELECT posts.*, users.imageURL FROM posts LEFT JOIN users ON posts.user = users.username"
     mycursor.execute(sql)
-    return render_template("posts.html", posts=mycursor.fetchall())
+    return render_template("posts.html", threads=mycursor.fetchall())
 
-@app.route("/post/<post>", methods=["GET", "POST"])
-def post_loader(post):
+@app.route("/thread/<thread>", methods=["GET", "POST"])
+def thread_loader(thread):
     loggedInUser = loggedIn()
     if loggedInUser:
         return loggedInUser
     sql = "SELECT posts.*, users.imageURL FROM posts LEFT JOIN users ON posts.user = users.username WHERE posts.postname = %s"
-    mycursor.execute(sql, (post,))
+    mycursor.execute(sql, (thread,))
     currentpost = mycursor.fetchone()
     print(currentpost)
     if currentpost == None:
@@ -139,7 +149,7 @@ def post_loader(post):
         mydb.commit()
         # Uppdaterar timern på post pagen
         sql = "UPDATE posts SET lastcommenttime = NOW() WHERE postname = %s"
-        mycursor.execute(sql, (post,))
+        mycursor.execute(sql, (thread,))
         mydb.commit()
         
     sql = "SELECT comments.*, users.imageURL FROM comments LEFT JOIN users ON comments.comment_user = users.username WHERE post_id=%s"
@@ -166,10 +176,29 @@ def user_loader(user):
     mycursor.execute(sql, (currentuser[1], currentuser[1]))
     activities = mycursor.fetchall()
 
-    return render_template("user.html", user=currentuser, currentAccount=(user==session.get("user")), activity=activities)
-    
+    sql = "SELECT * FROM comments WHERE comment_user=%s;"
+    mycursor.execute(sql, (user,))
+    comments = mycursor.fetchall()
+    print(comments)
+    return render_template("user.html", user=currentuser, currentAccount=(user==session.get("user")), activity=activities, comments=comments)
 
-@app.route("/create-post", methods=["GET", "POST"])
+@app.route("/edit-user", methods=["GET", "POST"])
+def editUser():
+    loggedInUser = loggedIn()
+    if loggedInUser:
+        return loggedInUser
+
+    username = session.get("user")
+
+    if request.method == "POST":
+        return "W.I.P"
+
+    sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
+    mycursor.execute(sql, (username,))
+    user = mycursor.fetchone()
+    return render_template("edit-user.html", user=user)
+
+@app.route("/create-thread", methods=["GET", "POST"])
 def createPost():
     loggedInUser = loggedIn()
     if loggedInUser:
@@ -179,7 +208,7 @@ def createPost():
         sql = "SELECT * FROM posts WHERE postname=%s LIMIT 1;"
         mycursor.execute(sql, (postname,))
         if mycursor.fetchone() != None:
-            return render_template("create-post.html", alreadyPost=True)
+            return render_template("create-thread.html", alreadyPost=True)
 
         postdescription = request.form["postmessage"]
 
@@ -188,7 +217,7 @@ def createPost():
         mycursor.execute(sql, val)
         mydb.commit()
         print(mycursor.rowcount, "added.")
-        return "Created Post"
-    return render_template("create-post.html")
+        return "Created Thread"
+    return render_template("create-thread.html")
 
 app.run(host="0.0.0.0", port=5000, debug=True)

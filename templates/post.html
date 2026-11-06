@@ -2,7 +2,7 @@
 {% block content %}
 <div class="post">
     <div class="post-title-card">
-        <h2 class="post-title">{{ post[2] }}</h2>
+        <h2 class="post-title">Thread: {{ post[2] }}</h2>
         <div class="commentProfile">
             <div class="posts-author">
                 <img
@@ -11,15 +11,15 @@
                     alt="{{ post[1] }}'s profile picture"
                 >
             </div>
+            <p class="post-user">Thread by: {{ post[1] }}</p>
         </div>
-        <p class="post-user">Posted by: {{ post[1] }}</p>
         <p class="post-message">{{ post[3] }}</p>
         <p class="post-time"> {{ post[4].strftime("%Y-%m-%d %H:%M:%S") }} </p>
     </div>
     <hr style="margin-top: 40px;">
     <div class="comments">
         {% for comment in comments %}
-            <div class="comment" {% if loop.index is even %} style="background-color: rgb(219, 219, 219);" {% endif %}>
+            <div id="{{ comment[0] }}" class="comment" {% if loop.index is even %} style="background-color: rgb(219, 219, 219);" {% endif %}>
                 <div class="commentProfile">
                     <img
                     class="posts-profile-picture"

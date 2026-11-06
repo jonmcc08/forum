@@ -1,21 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-{{ currentAccount }}
-
 <div class="user">
-    <div class="user-profile-picture">
-        <img 
-        class="posts-profile-picture"
-        src="{{ url_for('static', filename='profile_pictures/' ~ (user[6] or 'nU.webp')) }}" 
-        alt="Profile Picture">
-        <h2>{{ user[1] }}</h2>
+    <div class="user-profile-info">
+        <div class="user-profile">
+            <img 
+            class="posts-profile-picture"
+            src="{{ url_for('static', filename='profile_pictures/' ~ (user[6] or 'nU.webp')) }}" 
+            alt="Profile Picture">
+            <h2>{{ user[1] }}</h2>
+        </div>
+        {% if currentAccount %}
+            <button onclick="window.location.href='/edit-user'">Edit profile</button>
+        {% endif %}
     </div>
+    {% if activity %}
     <div class="activities">
+        <h2 style="text-decoration: underline;">User activites</h2>
         {% for post in activity %}
             <div class="activity">
-                {{ post[2] }} : <a href="/post/{{ post[2] }}">Link</a>
+                {{ post[2] }} : <a href="/thread/{{ post[2] }}">Link</a>
+                <div class="userComments">
+                    {% for comment in comments %}
+                        {% if comment[1] == post[0] %}
+                        <hr>
+                        <a href="/thread/{{ post[2] }}#{{ comment[0] }}">
+                            <div class="userComment">
+                                <p>{{ comment[3] }}</p>
+                                <p>{{ comment[4] }}</p>
+                            </div>
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         {% endfor %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}
