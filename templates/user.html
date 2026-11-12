@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="user">
-    <div class="user-profile-info">
+    <div class="user-profile-info space-between">
         <div class="user-profile">
             <img 
             class="posts-profile-picture"
@@ -13,12 +13,20 @@
             <button onclick="window.location.href='/edit-user'">Edit profile</button>
         {% endif %}
     </div>
+    <div class="user-data">
+        <a href="mailto:{{ user[5] }}">Contact</a>
+    </div>
     {% if activity %}
     <div class="activities">
         <h2 style="text-decoration: underline;">User activites</h2>
         {% for post in activity %}
             <div class="activity">
-                {{ post[2] }} : <a href="/thread/{{ post[2] }}">Link</a>
+                <div class="userThread space-between">
+                    <p>Thread: <a href="/thread/{{ post[2] }}">{{ post[2] }}</a></p>
+                    {% if post[1] == user[1] %}
+                    <p style="font-style: italic;">Thread author</p>
+                    {% endif %}
+                </div>
                 <div class="userComments">
                     {% for comment in comments %}
                         {% if comment[1] == post[0] %}

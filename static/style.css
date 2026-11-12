@@ -92,7 +92,7 @@ footer {
     padding: 10px;
 }
 
-.user-profile-info {
+.space-between {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

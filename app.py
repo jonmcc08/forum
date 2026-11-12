@@ -49,6 +49,21 @@ def loggedIn():
         return render_template("reject-login.html"), {"Refresh": "3; url=/login"}
     return None
 
+def saveImage(image, filename):
+    image_url = "nU.webp"
+    if image.filename != "":
+        with Image.open(image) as img:
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGBA")
+            else:
+                img = img.convert("RGB")
+
+            img = img.resize((100, 100), Image.Resampling.LANCZOS)
+            image_url = f"{filename}.webp"
+            file_upload = os.path.join("static/profile_pictures", image_url)
+            img.save(file_upload, "WEBP", quality=80)
+    return image_url
+
 @app.route("/")
 def homepage():
     return render_template("main.html")
@@ -92,18 +107,7 @@ def account_creation():
         password = request.form["password"].encode("utf-8")
         hashed_pw = bcrypt.hashpw(password, s)
         image = request.files["picture"]
-        image_url = "nU.webp"
-        if image.filename != "":
-            with Image.open(image) as img:
-                if img.mode in ("RGBA", "P"):
-                    img = img.convert("RGBA")
-                else:
-                    img = img.convert("RGB")
-
-                img = img.resize((100, 100), Image.Resampling.LANCZOS)
-                image_url = f"{username}.webp"
-                file_upload = os.path.join("static/profile_pictures", image_url)
-                img.save(file_upload, "WEBP", quality=80)
+        image_url = saveImage(image, username)
 
         sql = "INSERT INTO users (username, firstname, lastname, email, imageURL, password) VALUES (%s, %s, %s, %s, %s, %s);"
         val = (username, firstname, lastname, email, image_url, hashed_pw)
@@ -191,7 +195,28 @@ def editUser():
     username = session.get("user")
 
     if request.method == "POST":
-        return "W.I.P"
+        oldpassword = request.form["oldpassword"]
+
+        firstname = request.form["firstname"]
+        lastname = request.form["lastname"]
+        email = request.form["email"]
+        name = request.form["username"]
+        password = request.form["password"].encode("utf-8")
+        image = request.files["picture"]
+
+        if firstname:
+            print("Firstname")
+        if lastname:
+            print("Lastname")
+        if email:
+            print("Email")
+        if password:
+            print("Password")
+        if image:
+            print("Image")
+        hashed_pw = bcrypt.hashpw(password, s)
+        if name:
+            print("Name")
 
     sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
     mycursor.execute(sql, (username,))
