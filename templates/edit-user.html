@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="edituser">
+    {% if editedPage == 1 %}
+    <h2 style="color: red;">No data provided, nothing updated.</h2>
+    {% elif editedPage == 2 %}
+    <h2 style="color: red;">Username already exists, please try again.</h2>
+    {% elif editedPage == true %}
+    <h2 style="color: green;">Successfully updated profile.</h2>
+    {% endif %}
     <form method="post" enctype="multipart/form-data">
         Firstname: <input name="firstname" id="firstname" autocomplete="given-name" placeholder="{{ user[2] }}"> <br>
         Lastname: <input name="lastname" id="lastname" autocomplete="family-name" placeholder="{{ user[3] }}"> <br>
@@ -11,6 +18,9 @@
         <div id="picture-container">
             <img id="uploaded-file" src="/static/profile_pictures/{{ user[6] }}" alt="Picture of the user">
         </div>
+        {% if editedPage == false %}
+            <p style="color: red;">Incorrect password</p>
+        {% endif %}
         Old password (REQUIRED): <input name="oldpassword" required type="password"> <br>
         <input type="submit" id="submit">
     </form>

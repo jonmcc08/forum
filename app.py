@@ -64,6 +64,72 @@ def saveImage(image, filename):
             img.save(file_upload, "WEBP", quality=80)
     return image_url
 
+def editUserPage(username):
+    sql = "SELECT id, imageURL FROM users WHERE username=%s LIMIT 1;"
+    mycursor.execute(sql, (username,))
+    user = mycursor.fetchone()
+    id = user[0]
+    imageURL = user[1]
+    print(user)
+    oldpassword = request.form["oldpassword"]
+    user_login = userLogin(username, oldpassword)
+    print(user_login)
+    if user_login != 3:
+        return False
+    firstname = request.form["firstname"]
+    lastname = request.form["lastname"]
+    email = request.form["email"]
+    name = request.form["username"]
+    password = request.form["password"].encode("utf-8")
+    image = request.files["picture"]
+
+    return #temporary
+    sqlfield = []
+    sqlVars = []
+    if name:
+        sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
+        mycursor.execute(sql, (name,))
+        if mycursor.fetchone():
+            return 2
+        sqlfield.append("name = %s")
+        sqlVars.append(name)
+        if not image & None:
+            oldfile = os.join.path(app.static_folder, f"{username}.webp")
+            newfile = os.join.path(app.static_folder, f"{name}.webp")
+            os.rename(oldfile, newfile)
+
+            sqlfield.append("imageURL = %s")
+            sqlVars.append(f"{name}.webp")
+    if image:
+        sqlfield.append("imageURL = %s")
+        newusername = username
+        if name:
+            newusername = name
+        saveImage(image, newusername)
+        sqlVars.append(f"{newusername}.webp")
+    if firstname:
+        sqlfield.append("firstname = %s")
+        sqlVars.append(firstname)
+    if lastname:
+        sqlfield.append("lastname = %s")
+        sqlVars.append(lastname)
+    if email:
+        sqlfield.append("email = %s")
+        sqlVars.append(email)
+    if password:
+        hashed_pw = bcrypt.hashpw(password, s)
+        sqlfield.append("password = %s")
+        sqlVars.append(hashed_pw)
+
+    if sqlfield:
+        sql = "UPDATE users SET " + " ,".join(sqlfield) + " WHERE id=%s"
+        sqlVars.append(id)
+
+        mycursor.execute(sql, tuple(sqlVars))
+        mydb.commit()
+        return True
+    return 1 # Error message for user.
+
 @app.route("/")
 def homepage():
     return render_template("main.html")
@@ -193,35 +259,15 @@ def editUser():
         return loggedInUser
 
     username = session.get("user")
+    editedPage = None
 
     if request.method == "POST":
-        oldpassword = request.form["oldpassword"]
-
-        firstname = request.form["firstname"]
-        lastname = request.form["lastname"]
-        email = request.form["email"]
-        name = request.form["username"]
-        password = request.form["password"].encode("utf-8")
-        image = request.files["picture"]
-
-        if firstname:
-            print("Firstname")
-        if lastname:
-            print("Lastname")
-        if email:
-            print("Email")
-        if password:
-            print("Password")
-        if image:
-            print("Image")
-        hashed_pw = bcrypt.hashpw(password, s)
-        if name:
-            print("Name")
+        editedPage = editUserPage(username)
 
     sql = "SELECT * FROM users WHERE username=%s LIMIT 1;"
     mycursor.execute(sql, (username,))
     user = mycursor.fetchone()
-    return render_template("edit-user.html", user=user)
+    return render_template("edit-user.html", user=user, editedPage=editedPage)
 
 @app.route("/create-thread", methods=["GET", "POST"])
 def createPost():
