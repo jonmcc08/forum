@@ -11,7 +11,7 @@
                     alt="{{ post[1] }}'s profile picture"
                 >
             </div>
-            <p class="post-user">Thread by: {{ post[1] }}</p>
+            <p class="post-user">Thread by: <a href="/user/{{ post[1] }}">{{ post[1] }}</a></p>
         </div>
         <p class="post-message">{{ post[3] }}</p>
         <p class="post-time"> {{ post[4].strftime("%Y-%m-%d %H:%M:%S") }} </p>
@@ -26,7 +26,7 @@
                     src="{{ url_for('static', filename='profile_pictures/' ~ (comment[5] or 'nU.webp')) }}"
                     alt="{{ comment[2] }}'s profile picture"
                     >
-                    <p>{{ comment[2] }}</p>
+                    <a href="/user/{{ comment[2] }}">{{ comment[2] }}</a>
                 </div>
                 <p>{{ comment[3] }}</p>
                 <p>{{ comment[4] }}</p>

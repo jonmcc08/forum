@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="edituser">
-    {% if editedPage == 1 %}
+    {% if editedPage is boolean and editedPage %}
+    <h2 style="color: green;">Successfully updated profile.</h2>
+    {% elif editedPage == 1 %}
     <h2 style="color: red;">No data provided, nothing updated.</h2>
     {% elif editedPage == 2 %}
     <h2 style="color: red;">Username already exists, please try again.</h2>
-    {% elif editedPage == true %}
-    <h2 style="color: green;">Successfully updated profile.</h2>
     {% endif %}
     <form method="post" enctype="multipart/form-data">
         Firstname: <input name="firstname" id="firstname" autocomplete="given-name" placeholder="{{ user[2] }}"> <br>
@@ -25,6 +25,5 @@
         <input type="submit" id="submit">
     </form>
 </div>
+<script src="/static/loadImage.js"></script>
 {% endblock %}
-
-"Ska lägga till placeholders och annat för att fixa detta."

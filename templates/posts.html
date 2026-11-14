@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+{% if not threads %}
+<p>No thread exists.</p>
+{% endif %}
 {% for post in threads %}
     <a class="post-wrapper" href="thread/{{ post[2] }}">
         <div class="posts" {% if loop.index is even %} style="background-color: rgb(219, 219, 219);" {% endif %}>

@@ -4,9 +4,9 @@
     <div class="user-profile-info space-between">
         <div class="user-profile">
             <img 
-            class="posts-profile-picture"
             src="{{ url_for('static', filename='profile_pictures/' ~ (user[6] or 'nU.webp')) }}" 
-            alt="Profile Picture">
+            alt="Profile Picture"
+            style="width: 100px; height: 100px; border-radius: 10px;">
             <h2>{{ user[1] }}</h2>
         </div>
         {% if currentAccount %}
